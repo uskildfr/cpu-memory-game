@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<title>Гра: Процесор та пам'ять — 4-В клас</title>
+<style>
+  :root {
+    --bg: #1b1f3b;
+    --card: #2b315c;
+    --accent: #f2b135;
+    --accent2: #5bc8af;
+    --text: #ffffff;
+    --bad: #e2555a;
+    --good: #5bc8af;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Calibri, "Segoe UI", sans-serif;
+    background: linear-gradient(135deg, var(--bg), #262b52);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 20px;
+  }
+  h1 {
+    text-align: center;
+    color: var(--accent);
+    font-size: 2em;
+    margin-bottom: 4px;
+  }
+  .sub {
+    text-align: center;
+    color: #cfd3ff;
+    margin-bottom: 24px;
+  }
+  .nav {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+  }
+  .nav button {
+    background: var(--card);
+    color: var(--text);
+    border: 2px solid var(--accent);
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-size: 1em;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .nav button.active {
+    background: var(--accent);
+    color: var(--bg);
+  }
+  .screen { display: none; max-width: 900px; margin: 0 auto; }
+  .screen.active { display: block; }
+  .panel {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 30px;
+    border: 2px solid var(--accent);
+  }
+  .panel h2 {
+    color: var(--accent);
+    margin-top: 0;
+    text-align: center;
+  }
+  .zones {
+    display: flex;
+    gap: 20px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+  .zone {
+    flex: 1;
+    min-width: 240px;
+    background: rgba(255,255,255,0.05);
+    border: 2px dashed var(--accent2);
+    border-radius: 16px;
+    padding: 16px;
+    min-height: 180px;
+  }
+  .zone h3 { text-align: center; color: var(--accent2); margin-top: 0; }
+  .pool {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin: 20px 0;
+    min-height: 60px;
+  }
+  .chip {
+    background: var(--bg);
+    border: 2px solid var(--accent);
+    color: var(--text);
+    padding: 12px 18px;
+    border-radius: 30px;
+    font-size: 1.05em;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+  }
+  .chip:active { cursor: grabbing; }
+  .chip.placed-good { border-color: var(--good); background: #1c3d38; }
+  .chip.placed-bad { border-color: var(--bad); background: #3d1c1e; }
+  .dropzone.over { background: rgba(242,177,53,0.15); }
+  .btnrow { display: flex; justify-content: center; gap: 14px; margin-top: 20px; flex-wrap: wrap; }
+  .btnrow button {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-size: 1.05em;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .score { text-align: center; font-size: 1.3em; margin: 14px 0; color: var(--accent2); font-weight: bold; }
+  .quiz-q { background: rgba(255,255,255,0.05); border-radius: 14px; padding: 18px; margin-bottom: 16px; }
+  .quiz-q p.qtext { font-size: 1.15em; margin-top: 0; }
+  .opts { display: flex; flex-direction: column; gap: 8px; }
+  .opts button {
+    background: var(--bg);
+    border: 2px solid var(--accent2);
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: 10px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 1em;
+  }
+  .opts button.correct { background: #1c3d38; border-color: var(--good); }
+  .opts button.wrong { background: #3d1c1e; border-color: var(--bad); }
+  .opts button[disabled] { cursor: default; }
+  .feedback { text-align: center; font-size: 1.4em; font-weight: bold; margin-top: 10px; min-height: 30px; }
+  .memcard {
+    background: var(--bg);
+    border: 2px solid var(--accent);
+    border-radius: 14px;
+    padding: 14px;
+    margin: 10px 0;
+    font-size: 1.05em;
+  }
+  .memcard .ans { display: flex; gap: 10px; margin-top: 10px; }
+  .memcard button { flex: 1; padding: 10px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; }
+  .b-ram { background: var(--accent2); color: var(--bg); }
+  .b-rom { background: var(--accent); color: var(--bg); }
+  .hero-row {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+  .hero-row img {
+    height: 150px;
+    width: auto;
+    max-width: 100%;
+    border-radius: 14px;
+    border: 2px solid var(--accent2);
+    object-fit: cover;
+  }
+  .zone img {
+    display: block;
+    width: 100%;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Процесор та пам'ять</h1>
+<div class="sub">Інтерактивні вправи • 4-В клас • Інформатика</div>
+
+<div class="nav">
+  <button class="tab active" data-screen="s1">1. Пристрої введення / виведення</button>
+  <button class="tab" data-screen="s2">2. RAM чи ROM?</button>
+  <button class="tab" data-screen="s3">3. Підсумкова вікторина</button>
+</div>
+
+<!-- SCREEN 1: drag devices into input/output -->
+<div class="screen active" id="s1">
+  <div class="panel">
+    <h2>Гра: «Хто назве більше?» — Введення чи виведення?</h2>
+    <div class="hero-row">
+      <img src="img/l1_peripherals.jpg" alt="Клавіатура, миша та монітори">
+    </div>
+    <p style="text-align:center;color:#cfd3ff">Перетягни кожен пристрій у потрібну зону (на телефоні/планшеті — торкнись і потримай, потім перетягни).</p>
+    <div class="zones">
+      <div class="zone dropzone" id="zone-in" data-type="in"><h3>Введення даних</h3></div>
+      <div class="zone dropzone" id="zone-out" data-type="out"><h3>Виведення даних</h3></div>
+    </div>
+    <div class="pool" id="pool1"></div>
+    <div class="score" id="score1">Розподілено: 0 / 8</div>
+    <div class="btnrow">
+      <button onclick="resetGame1()">Почати заново</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 2: RAM vs ROM classification -->
+<div class="screen" id="s2">
+  <div class="panel">
+    <h2>RAM чи ROM?</h2>
+    <div class="hero-row">
+      <img src="img/l1_ram2.jpg" alt="Модуль оперативної пам'яті">
+      <img src="img/l1_motherboard2.jpg" alt="Материнська плата">
+    </div>
+    <p style="text-align:center;color:#cfd3ff">Прочитай твердження і натисни правильну відповідь.</p>
+    <div id="memList"></div>
+    <div class="score" id="score2">Правильно: 0 / 6</div>
+    <div class="btnrow">
+      <button onclick="resetGame2()">Почати заново</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 3: quiz -->
+<div class="screen" id="s3">
+  <div class="panel">
+    <h2>Підсумкова вікторина</h2>
+    <div class="hero-row">
+      <img src="img/l1_case.jpg" alt="Комп'ютер у зборі">
+    </div>
+    <div id="quizArea"></div>
+    <div class="score" id="score3"></div>
+    <div class="feedback" id="quizFinal"></div>
+    <div class="btnrow">
+      <button onclick="resetQuiz()">Пройти ще раз</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---------- NAVIGATION ----------
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.screen).classList.add('active');
+  });
+});
+
+// ---------- GAME 1: drag and drop ----------
+const devices = [
+  {name: "Клавіатура", type: "in"},
+  {name: "Миша", type: "in"},
+  {name: "Мікрофон", type: "in"},
+  {name: "Веб-камера", type: "in"},
+  {name: "Монітор", type: "out"},
+  {name: "Колонки", type: "out"},
+  {name: "Принтер", type: "out"},
+  {name: "Проєктор", type: "out"},
+];
+let placed1 = 0;
+
+function resetGame1() {
+  placed1 = 0;
+  document.getElementById('score1').textContent = "Розподілено: 0 / " + devices.length;
+  const pool = document.getElementById('pool1');
+  pool.innerHTML = "";
+  document.getElementById('zone-in').querySelectorAll('.chip').forEach(c => c.remove());
+  document.getElementById('zone-out').querySelectorAll('.chip').forEach(c => c.remove());
+  const shuffled = [...devices].sort(() => Math.random() - 0.5);
+  shuffled.forEach(d => {
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.textContent = d.name;
+    chip.draggable = true;
+    chip.dataset.type = d.type;
+    chip.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('text/plain', d.name);
+      e.target.dataset.dragging = "1";
+    });
+    pool.appendChild(chip);
+  });
+}
+
+document.querySelectorAll('.dropzone').forEach(zone => {
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('over');
+    const name = e.dataTransfer.getData('text/plain');
+    const chip = [...document.querySelectorAll('#pool1 .chip')].find(c => c.textContent === name);
+    if (!chip) return;
+    const correct = chip.dataset.type === zone.dataset.type;
+    chip.classList.add(correct ? 'placed-good' : 'placed-bad');
+    chip.draggable = false;
+    zone.appendChild(chip);
+    placed1++;
+    document.getElementById('score1').textContent = "Розподілено: " + placed1 + " / " + devices.length;
+  });
+});
+
+resetGame1();
+
+// ---------- GAME 2: RAM vs ROM ----------
+const memFacts = [
+  {text: "Дані зникають, якщо вимкнути живлення", ans: "ram"},
+  {text: "Зберігає початкові інструкції для запуску комп'ютера", ans: "rom"},
+  {text: "Швидка, але «короткочасна» пам'ять", ans: "ram"},
+  {text: "Не стирається навіть без електроживлення", ans: "rom"},
+  {text: "Там працюють відкриті зараз програми та ігри", ans: "ram"},
+  {text: "Записана виробником, зазвичай не змінюється", ans: "rom"},
+];
+let correct2 = 0, answered2 = 0;
+
+function resetGame2() {
+  correct2 = 0; answered2 = 0;
+  document.getElementById('score2').textContent = "Правильно: 0 / " + memFacts.length;
+  const list = document.getElementById('memList');
+  list.innerHTML = "";
+  memFacts.forEach((f, i) => {
+    const card = document.createElement('div');
+    card.className = 'memcard';
+    card.innerHTML = `<div>${f.text}</div>
+      <div class="ans">
+        <button class="b-ram" data-i="${i}" data-choice="ram">RAM (оперативна)</button>
+        <button class="b-rom" data-i="${i}" data-choice="rom">ROM (постійна)</button>
+      </div>`;
+    list.appendChild(card);
+  });
+  list.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = +btn.dataset.i;
+      const card = btn.closest('.memcard');
+      if (card.dataset.done) return;
+      card.dataset.done = "1";
+      answered2++;
+      const ok = btn.dataset.choice === memFacts[i].ans;
+      if (ok) { correct2++; btn.style.outline = "3px solid #5bc8af"; }
+      else { btn.style.outline = "3px solid #e2555a"; }
+      card.querySelectorAll('button').forEach(b => b.disabled = true);
+      document.getElementById('score2').textContent = "Правильно: " + correct2 + " / " + memFacts.length;
+    });
+  });
+}
+resetGame2();
+
+// ---------- GAME 3: quiz ----------
+const quiz = [
+  {q: "Де розташований процесор?", opts: ["На материнській платі", "У моніторі", "У клавіатурі"], correct: 0},
+  {q: "Чому процесор називають «мозком» комп'ютера?", opts: ["Він найважчий", "Він виконує всі обчислення й команди", "Він найбільший за розміром"], correct: 1},
+  {q: "Чим оперативна пам'ять (RAM) відрізняється від флешки?", opts: ["Нічим не відрізняється", "RAM втрачає дані при вимкненні, флешка — ні", "Флешка швидша за RAM"], correct: 1},
+  {q: "Навіщо процесору потрібен кулер?", opts: ["Для краси", "Щоб охолоджувати процесор під час роботи", "Щоб під'єднувати мишу"], correct: 1},
+  {q: "Що станеться з незбереженою грою, якщо раптом вимкнеться світло?", opts: ["Нічого, все збережеться", "Дані з оперативної пам'яті зникнуть", "Гра перенесеться на флешку"], correct: 1},
+];
+let qi = 0, correct3 = 0;
+
+function renderQuiz() {
+  const area = document.getElementById('quizArea');
+  document.getElementById('quizFinal').textContent = "";
+  if (qi >= quiz.length) {
+    area.innerHTML = "";
+    document.getElementById('score3').textContent = "";
+    document.getElementById('quizFinal').textContent =
+      `Результат: ${correct3} / ${quiz.length} правильних відповідей!`;
+    return;
+  }
+  const item = quiz[qi];
+  document.getElementById('score3').textContent = `Питання ${qi + 1} з ${quiz.length}`;
+  area.innerHTML = `<div class="quiz-q">
+      <p class="qtext">${item.q}</p>
+      <div class="opts">${item.opts.map((o, i) => `<button data-i="${i}">${o}</button>`).join("")}</div>
+    </div>`;
+  area.querySelectorAll('.opts button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = +btn.dataset.i;
+      area.querySelectorAll('.opts button').forEach(b => b.disabled = true);
+      if (i === item.correct) {
+        btn.classList.add('correct');
+        correct3++;
+      } else {
+        btn.classList.add('wrong');
+        area.querySelectorAll('.opts button')[item.correct].classList.add('correct');
+      }
+      setTimeout(() => { qi++; renderQuiz(); }, 1100);
+    });
+  });
+}
+function resetQuiz() { qi = 0; correct3 = 0; renderQuiz(); }
+resetQuiz();
+</script>
+</body>
+</html>
