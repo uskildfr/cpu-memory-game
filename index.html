@@ -170,10 +170,26 @@
     border-radius: 10px;
     margin-bottom: 10px;
   }
+  .banner {
+    max-width: 900px;
+    margin: 0 auto 16px;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 2px solid var(--accent);
+  }
+  .banner img {
+    display: block;
+    width: 100%;
+    max-height: 260px;
+    object-fit: cover;
+  }
 </style>
 </head>
 <body>
 
+<div class="banner">
+  <img src="img/l1_title_wide.jpg" alt="Процесор та пам'ять — банер уроку">
+</div>
 <h1>Процесор та пам'ять</h1>
 <div class="sub">Інтерактивні вправи • 4-В клас • Інформатика</div>
 
@@ -189,6 +205,7 @@
     <h2>Гра: «Хто назве більше?» — Введення чи виведення?</h2>
     <div class="hero-row">
       <img src="img/l1_peripherals.jpg" alt="Клавіатура, миша та монітори">
+      <img src="img/l1_ports.jpg" alt="Порти для підключення пристроїв">
     </div>
     <p style="text-align:center;color:#cfd3ff">Перетягни кожен пристрій у потрібну зону (на телефоні/планшеті — торкнись і потримай, потім перетягни).</p>
     <div class="zones">
@@ -210,6 +227,7 @@
     <div class="hero-row">
       <img src="img/l1_ram2.jpg" alt="Модуль оперативної пам'яті">
       <img src="img/l1_motherboard2.jpg" alt="Материнська плата">
+      <img src="img/l1_storage.jpg" alt="Носії постійної пам'яті: диски, флешки">
     </div>
     <p style="text-align:center;color:#cfd3ff">Прочитай твердження і натисни правильну відповідь.</p>
     <div id="memList"></div>
@@ -226,6 +244,7 @@
     <h2>Підсумкова вікторина</h2>
     <div class="hero-row">
       <img src="img/l1_case.jpg" alt="Комп'ютер у зборі">
+      <img src="img/l1_cpu.jpg" alt="Процесор">
     </div>
     <div id="quizArea"></div>
     <div class="score" id="score3"></div>
