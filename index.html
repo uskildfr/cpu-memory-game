@@ -95,12 +95,23 @@
     background: var(--bg);
     border: 2px solid var(--accent);
     color: var(--text);
-    padding: 12px 18px;
-    border-radius: 30px;
-    font-size: 1.05em;
+    padding: 8px;
+    border-radius: 16px;
+    font-size: 0.95em;
     cursor: grab;
     user-select: none;
     touch-action: none;
+    width: 120px;
+    text-align: center;
+  }
+  .chip img {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 10px;
+    display: block;
+    margin-bottom: 6px;
+    pointer-events: none;
   }
   .chip:active { cursor: grabbing; }
   .chip.placed-good { border-color: var(--good); background: #1c3d38; }
@@ -162,7 +173,7 @@
     border: 2px solid var(--accent2);
     object-fit: cover;
   }
-  .zone img {
+  .zone > img {
     display: block;
     width: 100%;
     height: 110px;
@@ -268,14 +279,14 @@ document.querySelectorAll('.tab').forEach(btn => {
 
 // ---------- GAME 1: drag and drop ----------
 const devices = [
-  {name: "Клавіатура", type: "in"},
-  {name: "Миша", type: "in"},
-  {name: "Мікрофон", type: "in"},
-  {name: "Веб-камера", type: "in"},
-  {name: "Монітор", type: "out"},
-  {name: "Колонки", type: "out"},
-  {name: "Принтер", type: "out"},
-  {name: "Проєктор", type: "out"},
+  {name: "Клавіатура", type: "in", img: "img/dev_keyboard.jpg"},
+  {name: "Миша", type: "in", img: "img/dev_mouse.jpg"},
+  {name: "Мікрофон", type: "in", img: "img/dev_mic.jpg"},
+  {name: "Веб-камера", type: "in", img: "img/dev_webcam.jpg"},
+  {name: "Монітор", type: "out", img: "img/dev_monitor.jpg"},
+  {name: "Колонки", type: "out", img: "img/dev_speakers.jpg"},
+  {name: "Принтер", type: "out", img: "img/dev_printer.jpg"},
+  {name: "Проєктор", type: "out", img: "img/dev_projector.jpg"},
 ];
 let placed1 = 0;
 
@@ -290,9 +301,10 @@ function resetGame1() {
   shuffled.forEach(d => {
     const chip = document.createElement('div');
     chip.className = 'chip';
-    chip.textContent = d.name;
+    chip.innerHTML = `<img src="${d.img}" alt="${d.name}"><div>${d.name}</div>`;
     chip.draggable = true;
     chip.dataset.type = d.type;
+    chip.dataset.name = d.name;
     chip.addEventListener('dragstart', e => {
       e.dataTransfer.setData('text/plain', d.name);
       e.target.dataset.dragging = "1";
@@ -308,7 +320,7 @@ document.querySelectorAll('.dropzone').forEach(zone => {
     e.preventDefault();
     zone.classList.remove('over');
     const name = e.dataTransfer.getData('text/plain');
-    const chip = [...document.querySelectorAll('#pool1 .chip')].find(c => c.textContent === name);
+    const chip = [...document.querySelectorAll('#pool1 .chip')].find(c => c.dataset.name === name);
     if (!chip) return;
     const correct = chip.dataset.type === zone.dataset.type;
     chip.classList.add(correct ? 'placed-good' : 'placed-bad');
